@@ -1,3 +1,7 @@
+## 0.1.5
+
+* The pub.dev example uses the gallery mark, and the stagger has a Replay button.
+
 ## 0.1.4
 
 * The pub.dev example uses the gallery colors, and the detail page has a Back button.

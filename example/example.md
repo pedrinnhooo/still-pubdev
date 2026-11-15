@@ -82,7 +82,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var _line = 'Preparing';
+  var _status = 'Preparing';
+  var _generation = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +140,8 @@ class _HomePageState extends State<HomePage> {
                 _Panel(
                   child: StillSwitcher(
                     child: Text(
-                      _line,
-                      key: ValueKey(_line),
+                      _status,
+                      key: ValueKey(_status),
                       style: const TextStyle(
                         color: _ink,
                         fontSize: 16,
@@ -155,7 +156,9 @@ class _HomePageState extends State<HomePage> {
                   child: FilledButton(
                     onPressed: () {
                       setState(() {
-                        _line = _line == 'Preparing' ? 'On the way' : 'Preparing';
+                        _status = _status == 'Preparing'
+                            ? 'On the way'
+                            : 'Preparing';
                       });
                     },
                     child: const Text('Next status'),
@@ -163,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 28),
                 StillStagger(
-                  key: ValueKey(widget.preference),
+                  key: ValueKey('${widget.preference}-$_generation'),
                   spacing: 12,
                   children: const [
                     _Note(
@@ -179,6 +182,25 @@ class _HomePageState extends State<HomePage> {
                       body: 'The pause between notes exists only while travel is on.',
                     ),
                   ],
+                ),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: OutlinedButton(
+                    onPressed: () => setState(() => _generation++),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: _ink,
+                      side: const BorderSide(color: _line),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: const Text('Replay'),
+                  ),
                 ),
                 const SizedBox(height: 28),
                 Align(
@@ -271,9 +293,9 @@ class _Bar extends StatelessWidget {
             height: 52,
             child: Row(
               children: [
-                if (leading != null) leading!,
-                if (leading == null) const SizedBox(width: 16),
-                const _Mark(),
+                if (leading != null) leading! else const SizedBox(width: 16),
+                if (leading != null) const SizedBox(width: 8),
+                const _BrandMark(),
                 const SizedBox(width: 10),
                 Text(
                   title,
@@ -293,21 +315,69 @@ class _Bar extends StatelessWidget {
   }
 }
 
-class _Mark extends StatelessWidget {
-  const _Mark();
+class _BrandMark extends StatelessWidget {
+  const _BrandMark();
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return const SizedBox(
       width: 26,
       height: 26,
-      decoration: BoxDecoration(
-        color: const Color(0xFF0C1A16),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: _accent, width: 1.5),
-      ),
+      child: CustomPaint(painter: _BrandPainter()),
     );
   }
+}
+
+class _BrandPainter extends CustomPainter {
+  const _BrandPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const accent = Color(0xFF3EE0C5);
+    const radius = Radius.circular(5);
+
+    final behind = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.04,
+        size.height * 0.18,
+        size.width * 0.58,
+        size.height * 0.64,
+      ),
+      radius,
+    );
+    canvas.drawRRect(
+      behind,
+      Paint()
+        ..color = const Color(0x663EE0C5)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.3,
+    );
+
+    final arrived = RRect.fromRectAndRadius(
+      Rect.fromLTWH(
+        size.width * 0.28,
+        size.height * 0.08,
+        size.width * 0.66,
+        size.height * 0.84,
+      ),
+      radius,
+    );
+    canvas.drawRRect(arrived, Paint()..color = const Color(0xFF0C1A16));
+    canvas.drawRRect(
+      arrived,
+      Paint()
+        ..color = accent
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5,
+    );
+    canvas.drawRRect(
+      arrived.deflate(3.2),
+      Paint()..color = const Color(0x553EE0C5),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class _ModeChip extends StatelessWidget {
