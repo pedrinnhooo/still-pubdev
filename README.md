@@ -2,48 +2,32 @@
 
 Motion that knows when to stop.
 
-Wrap the app once. When the platform asks for Reduce Motion, slides become a cross-fade. When it asks to remove animations, the next state is already on screen. Every widget under that wrap follows the same decision.
+Someone turns on Reduce Motion, and a slide becomes a fade. Someone turns animations off, and the next state is already on screen. You set that rule once. Every animation you opt into follows it.
 
-## What Flutter leaves to you
-
-Flutter already records Reduce Motion (iOS) and Remove animations (Android). It stores the flag and stops there.
-
-`AnimationController` ignores Reduce Motion on purpose. The framework wants a cross-fade instead of a shorter slide, and that choice belongs to each widget. A card that enters from below still enters from below for someone who asked the motion to stop.
-
-Remove animations is a separate flag. `AnimationController` snaps to the end by itself. Reduce Motion has no equivalent.
-
-| Situation | Flutter | `still` |
-| --- | --- | --- |
-| Reduce Motion is on | The slide keeps traveling. Each animation reads the flag on its own. | Travel, scale, and stagger become zero. What remains is a cross-fade. |
-| Remove animations is on | The controller snaps to the end. A stagger can still leave later children waiting. | Duration and the wait between children become zero. The next state is already there. |
-| You want to see all three results | Change the operating system setting. | Set `preference` on `MotionScope` to `reduced`, `off`, or `full`. |
-| The app has its own design system | Page transitions live on Material. Flutter 3.50 moves Material out of the SDK. | The package never imports Material. The same widgets run under `WidgetsApp`. |
-
-The package depends only on the Flutter widgets library, so a design system can respect the accessibility flag without importing one.
-
-## Use it
-
-Add the dependency in the app `pubspec.yaml`:
+## Install
 
 ```yaml
 dependencies:
-  still: ^0.1.0
+  still: ^0.1.2
 ```
-
-Until this is published, point `path` at the package directory:
-
-```yaml
-dependencies:
-  still:
-    path: ../still
-```
-
-In `main.dart`, wrap the app once. `MotionScope` is the parent of `MaterialApp` or `WidgetsApp`. One wrap covers every screen under it.
 
 ```dart
-import 'package:flutter/material.dart';
 import 'package:still/still.dart';
+```
 
+## How it fits together
+
+There are two pieces.
+
+The **rule** is `MotionScope`. Put it above the app, once. It reads the phone and decides: slide, fade, or cut. That decision covers every screen underneath.
+
+The **motion** is a widget you place only where something should move. A title, a card, a list, a new page. The rest of the screen stays still, because nothing there was asked to move.
+
+## 1. Wrap the app
+
+In `main.dart`, `MotionScope` is the parent of `MaterialApp`.
+
+```dart
 void main() {
   runApp(
     const MotionScope(
@@ -55,35 +39,29 @@ void main() {
 }
 ```
 
-`WidgetsApp` takes the same parent. Pass `preference: MotionPreference.reduced` (or `off`, or `full`) to preview a mode without changing the system setting.
+`WidgetsApp` takes the same parent. The package never imports Material, so a custom design system can use it as-is.
 
-Then put a widget where the motion already is:
+Leave `preference` alone and the phone decides. Pass one when you want to preview a mode on your machine:
 
-- A line or card that swaps, where you would use `AnimatedSwitcher`: `StillSwitcher`. Give each distinct child its own `Key`.
-- Something that enters once, such as a card when the screen opens: `StillEntrance`. Change the `Key` to play it again.
-- A list that arrives in sequence: `StillStagger`. With travel off, later children appear together.
-- A new screen: `StillPageRoute` in place of `MaterialPageRoute`. The push travels 64 logical pixels from the trailing edge.
-- An animation you already wrote: read `MotionScope.of(context).travels` and multiply your offset by it. The clock stays yours.
+```dart
+const MotionScope(
+  preference: MotionPreference.reduced,
+  child: MaterialApp(
+    home: HomePage(),
+  ),
+)
+```
 
-Samples for each one are below.
-
-## What the flags do
-
-| Signal | What `still` does |
+| Preference | What you see |
 | --- | --- |
-| Reduce Motion | Cross-fade. Travel, scale, and stagger become zero. The duration stays, so the fade is visible. |
-| Remove animations | No animation. The next state is already there. |
-| `MotionPreference.reduced` | The same cross-fade, forced. Useful in tests and in a preview toggle. |
-| `MotionPreference.off` | The same cut, forced. |
-| `MotionPreference.full` | Travel stays on even if Reduce Motion is on. |
+| `platform` | Follows the phone. This is the default. |
+| `full` | Slides, scale, and the pause between items run. |
+| `reduced` | Travel is off. A cross-fade remains, long enough to see. |
+| `off` | Nothing animates. The next state is already there. |
 
-Remove animations is also read by `AnimationController` itself, and a `MediaQuery` cannot turn that engine flag off. `MotionPreference.full` does not override it either. On a device with animations removed, controllers still snap to the end.
+## 2. Mark the places that move
 
-On Flutter 3.47 and earlier, Reduce Motion is read from `AccessibilityFeatures.reduceMotion`. Flutter 3.50 adds `MediaQueryData.reduceMotion`, which widgets can override. `MotionScope` reads that field when the SDK has it and falls back when it does not, so the same code runs before and after the upgrade.
-
-## Widgets
-
-`StillSwitcher` needs a `Key` on each distinct child, same as `AnimatedSwitcher`.
+**A line or card that swaps.** The same job as `AnimatedSwitcher`. The `Key` is how `still` knows the child changed.
 
 ```dart
 StillSwitcher(
@@ -91,7 +69,7 @@ StillSwitcher(
 )
 ```
 
-`StillEntrance` plays once. Change its `Key` to play it again.
+**Something that enters once**, such as a card when the screen opens. Change the `Key` to play the entrance again.
 
 ```dart
 StillEntrance(
@@ -100,32 +78,48 @@ StillEntrance(
 )
 ```
 
-`StillStagger` uses one clock. When travel is dropped, later children do not sit there waiting for a stagger that was cancelled.
+**A short list that arrives in sequence.** One clock for the whole list. When travel is off, the later items show up together.
 
 ```dart
 StillStagger(
-  children: const [Note(title: 'Duration'), Note(title: 'Travel')],
+  children: const [
+    Note(title: 'Duration'),
+    Note(title: 'Travel'),
+  ],
 )
 ```
 
-`StillPageRoute` pushes from the trailing edge by 64 logical pixels. Pop uses the short duration.
+**A new screen.** Use it where you would push a `MaterialPageRoute`. The page comes in 64 pixels from the trailing edge. Going back is shorter.
 
 ```dart
 Navigator.of(context).push(
-  StillPageRoute<void>(builder: (_) => const DetailPage()),
+  StillPageRoute<void>(
+    builder: (_) => const DetailPage(),
+  ),
 );
 ```
 
-For an animation you already wrote, read the decision and zero the travel yourself:
+**An animation you already wrote.** Keep your own clock. Ask the scope if travel is allowed, and scale your offset by that answer.
 
 ```dart
 final motion = MotionScope.of(context);
 final dx = motion.travels ? 16 * controller.value : 0.0;
 ```
 
-## Testing
+## What the phone is asking
 
-Force the decision. You do not need to change the operating system setting.
+| Setting | What `still` does |
+| --- | --- |
+| Reduce Motion, usually from iOS | Slide, scale, and stagger become zero. The fade keeps its time, so the change stays visible. |
+| Remove animations, usually from Android | The time becomes zero. The next state is already on screen. |
+
+Flutter stores both settings. It leaves your slides alone. `AnimationController` ignores Reduce Motion on purpose: a fade is a different transition, and the widget is supposed to choose it. Most widgets never do. `still` chooses once, in `MotionScope`.
+
+Remove animations is also read by `AnimationController` itself. A `MediaQuery` cannot turn that engine flag back on, and neither can `MotionPreference.full`. On a phone with animations removed, controllers still jump to the end.
+
+## Try it in a test
+
+You can force the decision without changing the operating system.
 
 ```dart
 await tester.pumpWidget(
@@ -139,30 +133,31 @@ await tester.pumpWidget(
 );
 ```
 
-Or drive the platform flags:
+Or drive the platform flag:
 
 ```dart
 tester.platformDispatcher.accessibilityFeaturesTestValue =
     const FakeAccessibilityFeatures(reduceMotion: true);
 ```
 
-`MediaQueryData(disableAnimations: true)` above the scope is the Remove animations override.
+`MediaQueryData(disableAnimations: true)` above the scope is Remove animations.
 
-## Example
+## Gallery
 
-The gallery in `example/` toggles Platform, Full, Reduced, and Off on a switcher, a stagger, a hand-written loop, and a page route.
+The app in `example/` shows Platform, Full, Reduced, and Off on a switcher, a stagger, a hand-written loop, and a page route.
 
 ```bash
 cd example
-flutter run -d macos
-flutter run -d chrome
+flutter run
 ```
 
-Widget previews for the three effects live in `example/lib/previews.dart`.
+## Shared timing
 
-## Package skill
+`MotionScheme` holds the numbers every widget shares: `fast` (140 ms), `medium` (280 ms), `slow` (420 ms), and `travel` (24 pixels). Pass a scheme to `MotionScope` when the whole app should use other values. A single widget can still override its own duration and distance.
 
-`skills/still/SKILL.md` ships with the package. After publication, an app that depends on `still` can pick it up with `dart run skills@ get`. That is the Flutter 3.50 layout for skills published inside a pub.dev package.
+On Flutter 3.47 and earlier, Reduce Motion comes from `AccessibilityFeatures.reduceMotion`. Flutter 3.50 adds `MediaQueryData.reduceMotion`, which a test or a parent widget can override. `MotionScope` reads that field when the SDK has it.
+
+`skills/still/SKILL.md` ships inside the package. An app that depends on `still` can install it with `dart run skills@ get`.
 
 ## License
 
