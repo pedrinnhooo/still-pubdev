@@ -1,0 +1,23 @@
+name: still
+description: >-
+  Cross-fades instead of slides when the platform asks for Reduce Motion.
+  Style-neutral, so custom design systems keep working as Material leaves the SDK.
+version: 0.1.0
+topics:
+  - accessibility
+  - animation
+
+environment:
+  sdk: ^3.5.0
+  flutter: ">=3.24.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
