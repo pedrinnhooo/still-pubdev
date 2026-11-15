@@ -1,3 +1,7 @@
+## 0.1.4
+
+* The pub.dev example uses the gallery colors, and the detail page has a Back button.
+
 ## 0.1.3
 
 * The pub.dev example is one `main.dart`. `HomePage` uses `StillEntrance`, `StillSwitcher`, `StillStagger`, and `StillPageRoute`.
