@@ -1,3 +1,7 @@
+## 0.1.3
+
+* The pub.dev example is one `main.dart`. `HomePage` uses `StillEntrance`, `StillSwitcher`, `StillStagger`, and `StillPageRoute`.
+
 ## 0.1.2
 
 * README rewritten for the published package. Install is `still: ^0.1.2`, and the local path sample is gone.
