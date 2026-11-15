@@ -166,4 +166,4 @@ Widget previews for the three effects live in `example/lib/previews.dart`.
 
 ## License
 
-BSD 3-Clause. Put your name on the copyright line in `LICENSE` before you publish.
+BSD 3-Clause. Copyright 2026 Pedro Ruffo.
