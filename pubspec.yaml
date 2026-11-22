@@ -7,6 +7,7 @@ repository: https://github.com/pedrinnhooo/still-pubdev
 topics:
   - accessibility
   - animation
+  - motion
 screenshots:
   - description: Motion that knows when to stop.
     path: doc/banner.jpg
