@@ -1,5 +1,7 @@
 # still
 
+![still](doc/banner.jpg)
+
 Motion that knows when to stop.
 
 Someone turns on Reduce Motion, and a slide becomes a fade. Someone turns animations off, and the next state is already on screen. You set that rule once. Every animation you opt into follows it.
