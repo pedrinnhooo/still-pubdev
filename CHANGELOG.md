@@ -1,3 +1,8 @@
+## 0.1.7
+
+* README header with emoji and badges. Banner uses a GitHub URL so it renders on pub.dev.
+* Removed `screenshots` from pubspec so the banner does not appear in the pub.dev sidebar.
+
 ## 0.1.6
 
 * README hero banner for pub.dev.
