@@ -2,8 +2,6 @@
 
 #  still
 
----
-
 [![pub package](https://img.shields.io/pub/v/still.svg)](https://pub.dev/packages/still)
 [![Flutter](https://img.shields.io/badge/flutter-%3E%3D3.24.0-blue.svg)](https://flutter.dev)
 [![License: BSD-3-Clause](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](LICENSE)
