@@ -10,7 +10,7 @@ Someone turns on Reduce Motion, and a slide becomes a fade. Someone turns animat
 
 ```yaml
 dependencies:
-  still: ^0.1.5
+  still: ^0.1.6
 ```
 
 ```dart

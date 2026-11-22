@@ -2,7 +2,7 @@ name: still
 description: >-
   Cross-fades instead of slides when the platform asks for Reduce Motion.
   Style-neutral, so custom design systems keep working as Material leaves the SDK.
-version: 0.1.5
+version: 0.1.6
 repository: https://github.com/pedrinnhooo/still-pubdev
 topics:
   - accessibility

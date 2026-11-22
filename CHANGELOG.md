@@ -1,3 +1,7 @@
+## 0.1.6
+
+* README hero banner for pub.dev.
+
 ## 0.1.5
 
 * The pub.dev example uses the gallery mark, and the stagger has a Replay button.
