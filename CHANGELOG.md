@@ -1,3 +1,11 @@
+## 0.1.9
+
+* CHANGELOG lists the current package version.
+
+## 0.1.8
+
+* README title uses a film-frames emoji.
+
 ## 0.1.7
 
 * README header with emoji and badges. Banner uses a GitHub URL so it renders on pub.dev.

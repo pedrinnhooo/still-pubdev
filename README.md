@@ -1,6 +1,6 @@
 ![still](https://raw.githubusercontent.com/pedrinnhooo/still-pubdev/main/doc/banner.jpg)
 
-#  still
+# 🎞️  still
 
 [![pub package](https://img.shields.io/pub/v/still.svg)](https://pub.dev/packages/still)
 [![Flutter](https://img.shields.io/badge/flutter-%3E%3D3.24.0-blue.svg)](https://flutter.dev)
@@ -16,7 +16,7 @@ Someone turns on Reduce Motion, and a slide becomes a fade. Someone turns animat
 
 ```yaml
 dependencies:
-  still: ^0.1.8
+  still: ^0.1.9
 ```
 
 ```dart
